@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy the Set-as-a-Service application in us-west-1
+
+Resources:
+  SetServiceInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0dc5e9ff792ec08e3
+      InstanceType: t2.nano
+      KeyName: default
+      SecurityGroupIds:
+        - !Ref SetServiceSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          curl -sL https://raw.githubusercontent.com/lexicalbit/set-as-a-service/main/main.py -o /tmp/main.py
+          python3 /tmp/main.py
+
+  SetServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Join ["-", [setservice-security-group, dev]]
+      GroupDescription: "Allow HTTP/HTTPS inbound and outbound traffic"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  SetServiceEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref SetServiceInstance
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [setservice-eip, dev]]
+
+Outputs:
+  WebsiteURL:
+    Value: !Sub http://${SetServiceEIP}:8080/status
+    Description: App URL
