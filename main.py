@@ -208,7 +208,6 @@ class HTTPServer(BaseHTTPRequestHandler):
 class UnitTests(unittest.TestCase):
 
     # Positive Tests
-
     def test_set_has(self):
         test_set = BasicSet(1)
         self.assertTrue(test_set.HasItem(1))

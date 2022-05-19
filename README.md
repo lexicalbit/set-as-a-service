@@ -1,7 +1,7 @@
 # Set-as-a-Service REST API sample application
 
 This is a bare-bones example of a REST API that implements the
-'set' datatructure without using built-in hashmaps or sets
+'set' datatructure without using built-in hashmaps or sets.
 
 The entire application is contained within the `main.py` file,
 and the only requirement is Python 3.
